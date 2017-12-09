@@ -1,0 +1,28 @@
+{
+  "name": "inventory-service",
+  "version": "1.0.0",
+  "description": "Stores and retieves product attributes",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ayalajohn82/inventory-service.git"
+  },
+  "keywords": [
+    "service",
+    "inventory",
+    "amazon"
+  ],
+  "author": "John Ayala-Hernandez",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ayalajohn82/inventory-service/issues"
+  },
+  "homepage": "https://github.com/ayalajohn82/inventory-service#readme",
+  "dependencies": {
+    "express": "^4.16.2",
+    "mongoose": "^4.13.6"
+  }
+}

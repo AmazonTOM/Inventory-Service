@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express();
 const db = require('../database/index');
+const faker = require('faker');
 
 const AWS = require('aws-sdk');
 AWS.config.update({region: 'us-west-2'});
@@ -12,20 +13,7 @@ const client = new elasticsearch.Client({
 });
 
 app.get('/', (req, res) => {
-  var product = {
-    name: "toothpaste",
-    price: "3.00",
-    primeEligible: true,
-    quantity: 30000000,
-    warehouse: 'wooo',
-    weight: 9,
-    width: 100,
-    height: 22,
-    length: 12,
-    latitude: 3.33,
-    longitude: 111.11,
-  };
-  db.storeProduct(product);
+  db.generateProducts();
 });
 
 app.get('/cart', (req, res) => {

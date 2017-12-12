@@ -1,4 +1,4 @@
-# Project Name
+# Inventory-Service
 
 The project description
 

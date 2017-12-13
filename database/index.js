@@ -1,5 +1,5 @@
 const cassandra = require('cassandra-driver');
-const generate = require('./datagen');
+const { insertMany, clearDB } = require('./datagen');
 const db = new cassandra.Client({contactPoints: ['127.0.0.1'], keyspace: 'inventory'});
 db.connect((err, results) => {
   console.log('Cassandra connected!!')
@@ -17,7 +17,7 @@ const storeProduct = (product) => {
 };
 
 const generateProducts = () => {
-  generate(queryStoreProduct, db);
+  insertMany(db, 0, queryStoreProduct);
 };
 
 module.exports.getAllInventory = getAllInventory;

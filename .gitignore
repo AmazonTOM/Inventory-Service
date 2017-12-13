@@ -3,6 +3,7 @@ config/development.json
 config/production.json
 config/staging.json
 config/test.json
+package-lock.json
 
 # OS X
 .DS_Store
@@ -34,4 +35,3 @@ dist/
 # Deployed apps should consider commenting these lines out:
 # see https://npmjs.org/doc/faq.html#Should-I-check-my-node_modules-folder-into-git
 node_modules/
-bower_components/

@@ -1,6 +1,24 @@
 const faker = require('faker');
 const _ = require('underscore');
 
+// const elastic = require('./elasticsearch');
+
+// elastic.indexExists().then(function (exists) {  
+//   if (exists) { 
+//     return elastic.deleteIndex(); 
+//   } 
+// }).then(elastic.initIndex());
+
+// elastic.initIndex();
+// elastic.deleteIndex();
+// elastic.initMapping()
+//   .then((res) => {
+//     console.log(res);
+//   })
+//   .catch((err) => {
+//     console.log(err);
+//   });
+
 const randomWarehouse = () => {
   let warehouses = [{ name: 'San Fransico', latitude: 37.775, longitude: -122.419 }, { name: 'Chicago', latitude: 41.878, longitude: -87.629 }, { name: 'Austin', latitude: 30.267, longitude: -97.743 }, { name: 'Miami', latitude: 25.762, longitude: -80.192 }, { name: 'New York', latitude: 40.713, longitude: -74.006 }];
   const array = [];
@@ -12,21 +30,67 @@ const randomWarehouse = () => {
   return array;
 };
 
-const insertMany = (client, counter, query) => {
-  const arr = [];
-  let bool = 0;
+const primeBias = (height, length, width, weight) => {
+  let beta = 1;
+  if(height > 3000 || length > 3000 || width > 3000) {
+    return 0;
+  } else if(height > 1000 || length > 1000 || width > 1000) {
+    beta -= .15;
+  }
+  if(weight > 25) {
+    return 0;
+  } else if(weight > 10) {
+    beta -= .1;
+  }
+  beta_right = (beta > 0.5) ? 2*beta-1 : 2*(1-beta)-1;
+  var roundOrFloor = Math.random();
+  let primeeligible = false;
+  if (roundOrFloor > .75) {
+    primeeligible = Math.floor(beta_right);
+  } else {
+    primeeligible = Math.round(beta_right);
+  }
+  return primeeligible;
+};
+
+
+const insertMany = (client, counter) => {
+  const insert = [];
+  const update = [];
+  let info = [];
+  const quer = 'INSERT INTO test (p_id, name, price, primeeligible, weight, height, width, length, warehouses) VALUES (?,?,?,?,?,?,?,?,?)';
+  const quer2 = 'UPDATE quantity SET quantity = quantity + ? WHERE p_id = ?;';
   let boolean = true;
   for (let i = 0; i < 100; i += 1) {
-    if (bool >= 3) {
-      bool = 0;
-      boolean = false;
-    }
-    arr.push({ query, params: [parseFloat(Number(Math.random() * 4500).toFixed(2)), parseFloat(Number(Math.random() * 4500).toFixed(2)), parseFloat(Number(Math.random() * 100).toFixed(2)), boolean, randomWarehouse(), parseFloat(Number(Math.random() * 30).toFixed(2)), parseFloat(Number(Math.random() * 4500).toFixed(2)), Math.floor(Math.random() * 3000), faker.commerce.productName()] });
-    boolean = true;
-    bool+=1;
+    var index = counter + i + 1;
+    info = [
+      index, 
+      faker.commerce.productName(),
+      parseFloat(Number(Math.random() * 4500).toFixed(2)),
+      boolean,
+      parseFloat(Number(Math.random() * 4500).toFixed(2)),
+      parseFloat(Number(Math.random() * 100).toFixed(2)),
+      parseFloat(Number(Math.random() * 30).toFixed(2)),
+      parseFloat(Number(Math.random() * 4500).toFixed(2)),
+      randomWarehouse(),
+    ];
+    info[3] = primeBias(info[1], info[2], info[7], info[6]);
+    insert.push({ query: quer, params: info });
+    update.push({ query: quer2, params: [Math.floor(Math.random() * 3000), info[0]]});
   }
-  client.batch(arr, { prepare: true }).then(() => {counter += 100; console.log(counter); insertMany(client, counter);}).catch((err) => { console.log(err); });
+  client.batch(insert, { prepare: true })
+    .then(() => {
+      if (counter + 100 < 10000000) {
+        console.log(counter + 100);
+        client.batch(update, { prepare: true, counter: true})
+          .then(() => {
+            insertMany(client, counter + 100);
+        });
+      }
+    })
+    .catch((err) => { console.log(err); });
 };
+
 
 const clearDB = (client) => {
   const query = 'TRUNCATE products';

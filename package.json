@@ -24,6 +24,7 @@
   "homepage": "https://github.com/ayalajohn82/inventory-service#readme",
   "dependencies": {
     "aws-sdk": "^2.167.0",
+    "bluebird": "^3.5.1",
     "cassandra-driver": "^3.3.0",
     "elasticsearch": "^14.0.0",
     "eslint": "^4.9.0",
@@ -34,7 +35,9 @@
     "faker": "^4.1.0",
     "mongodb": "^3.0.0-rc0",
     "mongoose": "^4.13.6",
-    "redis": "^2.8.0"
+    "newrelic": "^2.4.2",
+    "redis": "^2.8.0",
+    "underscore": "^1.8.3"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0"

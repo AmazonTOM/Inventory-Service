@@ -29,19 +29,11 @@ const updateInventory = (cartItems) => {
   return client.batch(queries, { prepare: true, counter: true });
 };
 
-const checkInventory = (cartItems) => {
-  var queries = [];
-  for(let i = 0; i < cartItems.length; i++) {
-    client.execute(check, [ cartItems[i].product_id ], { prepare: true })
-    .then((result) => {
-      // console.log(result.rows[0].quantity.low);
-      if(result.rows[0].quantity.low - cartItems[i].quantity < 0) {
-        console.log('wooo');
-        throw false;
-      }
-    })
-    .catch(result => result);
-  }
+const checkInventory = (cartItem) => {
+  return client.execute(check, [ cartItem.product_id ], { prepare: true })
+  .then((result) => {
+    return result.rows[0].quantity.low
+  });
 };
 
 module.exports = { generate, clearDB, updateInventory, checkInventory };

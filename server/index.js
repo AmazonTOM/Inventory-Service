@@ -20,51 +20,45 @@ app.use(parser.urlencoded({ extended: true }));
 
 app.patch('/products/:product_id/quantity', (req, res) => {
   let queries = [];
+  let inventoryStatus = {
+    orderId: req.body.orderId,
+    status: {
+      success: [],
+      fail: [],
+    },
+  };  
   for(let i = 0; i < req.body.cart.length; i++) {
     queries.push(cache.getAsync(req.body.cart[i].product_id.toString()).then((result) => {
-      console.log('response',  result);
-      if(result > 0) {
+      // console.log('response',  result);
+
+      if(result === null) {
+        return checkInventory(req.body.cart[i])
+          .then((result) => {
+            cache.set(req.body.cart[i].product_id.toString(), result.toString());
+            if(result - req.body.cart[i].quantity > 0) {
+              return [req.body.cart[i].product_id, true];
+            } 
+            return [req.body.cart[i].product_id, false];
+          });
+      } else if(result > 0) {
        return [req.body.cart[i].product_id, true];
       } else {
         return [req.body.cart[i].product_id, false];
       }
-    }))
+    })
+     .then((result) => {
+       return result;
+     }));
   }
   Promise.all(queries)
     .then((result) => {
-      res.send(result);
+      const inventoryStatus = {
+        order_id: req.body.order_id,
+        status: result,
+      };
+      updateInventory(req.body.cart);
+      res.send(inventoryStatus);
     });
-  // client.get(, function(error, result) {
-  //   if (result) {
-  //     res.send({ "totalStars": result, "source": "redis cache" });
-  //   } else {
-  //     getUserRepositories(username)
-  //       .then(computeTotalStars)
-  //       .then(function(totalStars) {
-  //         // store the key-value pair (username:totalStars) in our cache
-  //         // with an expiry of 1 minute (60s)
-  //         client.setex(username, 60, totalStars);
-  //         // return the result to the user
-  //         res.send({ "totalStars": totalStars, "source": "GitHub API" });
-  //         }).catch(function(response) {
-  //           if (response.status === 404){
-  //             res.send('The GitHub username could not be found. Try "coligo-io" as an example!');
-  //           } else {
-  //             res.send(response);
-  //           }
-  //       });
-  //   }
-    
-  // });
-  // // var bool = checkInventory(req.body.cart);
-  // // console.log(bool);
-  // // if(bool) {
-  // //   updateInventory(req.body.cart).then((result) => {
-  // //     res.send(result);
-  //   });
-  //   res.send();
-  // }
-  // res.send();
 });
 
 app.listen(port);

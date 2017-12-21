@@ -1,6 +1,7 @@
 require('newrelic');
 const express = require('express');
 const parser = require('body-parser');
+const AWS = require('aws-sdk');
 const Promise = require("bluebird");
 const redis = require("redis");
 const cache = redis.createClient();
@@ -11,6 +12,37 @@ Promise.promisifyAll(redis.RedisClient.prototype);
 cache.on("error", function (err) {
   console.log("Error " + err);
 });
+
+AWS.config.update({region: 'us-west-2'});
+const sqs = new AWS.SQS({apiVersion: '2012-11-05'});
+
+const params = {
+  DelaySeconds: 10,
+  MessageAttributes: {
+   "Title": {
+     DataType: "String",
+     StringValue: "The Whistler"
+    },
+   "Author": {
+     DataType: "String",
+     StringValue: "John Grisham"
+    },
+   "WeeksOn": {
+     DataType: "Number",
+     StringValue: "6"
+    }
+  },
+  MessageBody: "Information about current NY Times fiction bestseller for week of 12/11/2016.",
+  QueueUrl: "SQS_QUEUE_URL"
+ };
+ 
+ sqs.sendMessage(params, function(err, data) {
+   if (err) {
+     console.log("Error", err);
+   } else {
+     console.log("Success", data.MessageId);
+   }
+ });
 
 const port = process.env.PORT || 8080;
 const app = express();
@@ -40,7 +72,7 @@ app.patch('/products/:product_id/quantity', (req, res) => {
             } 
             return [req.body.cart[i].product_id, false];
           });
-      } else if(result > 0) {
+      } else if(result - req.body.cart[i].quantity > 0) {
        return [req.body.cart[i].product_id, true];
       } else {
         return [req.body.cart[i].product_id, false];

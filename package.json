@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/ayalajohn82/inventory-service#readme",
   "dependencies": {
+    "aerospike": "^3.1.0",
     "aws-sdk": "^2.167.0",
     "bluebird": "^3.5.1",
     "cassandra-driver": "^3.3.0",

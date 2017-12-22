@@ -9,7 +9,7 @@ exports.aerospikeConfig = function () {
 
 exports.aerospikeDBParams = function () {
   return {
-    defaultNamespace: 'test',
-    defaultSet: 'test'
+    defaultNamespace: 'Inventory',
+    defaultSet: 'products'
   }
 }

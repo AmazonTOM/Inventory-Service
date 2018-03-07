@@ -53,15 +53,11 @@ const primeBias = (height, length, width, weight) => {
   return primeeligible;
 };
 
-let count = 8340229;
-let bool = true;
 const insertMany = (client, counter) => {
-  count++;
-  if(count === 4) {
-    bool = false;
-    count = 0;
+  if(counter % 3 === 0) {
+    let bool = false;
   } else {
-    bool = true;
+    let bool = true;
   }
   const product = {
     p_id: counter,
